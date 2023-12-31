@@ -30,10 +30,13 @@ func (c *ConcurrentMap[K, V]) Remove(key K) {
 	delete(c.items, key)
 }
 
-func (c *ConcurrentMap[K, V]) Get(key K) (V, bool) {
+func (c *ConcurrentMap[K, V]) Get(key K) (v V, ok bool) {
 	c.Lock()
 	defer c.Unlock()
-	return c.items[key]
+
+	v, ok = c.items[key]
+
+	return v, ok
 }
 
 func (c *ConcurrentMap[K, V]) Has(key K) (ok bool) {
