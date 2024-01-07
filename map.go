@@ -3,6 +3,7 @@ package go_concurrency
 import (
 	"sort"
 	"sync"
+	"golang.org/x/exp/maps"
 )
 
 type ConcurrentMap[K comparable, V any] struct {
@@ -76,6 +77,29 @@ func (c *ConcurrentMap[K, V]) Length() int {
 	c.Lock()
 	defer c.Unlock()
 	return len(c.items)
+}
+
+func (c *ConcurrentMap[K, V]) Keys() (keys []K){
+	keys := make([]K, 0, len(c.items))
+
+	for k := range c.items{
+		keys = append(keys, k)
+	}
+
+	return keys
+}
+
+
+func (c *ConcurrentMap[K, V]) First() (item *ConcurrentMapItem[K, V]) {
+	c.Lock()
+	defer c.Unlock()
+
+	for k, v := range c.items{
+		item = &ConcurrentMapItem[K, V]{k, v}
+		break
+	}
+
+	return item
 }
 
 func (c *ConcurrentMap[K, V]) Sort(reverse bool) {
