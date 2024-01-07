@@ -1,6 +1,9 @@
 package go_concurrency
 
-import "sync"
+import (
+	"sync"
+	"sort"
+)
 
 type ConcurrentMap[K comparable, V any] struct {
 	sync.RWMutex
@@ -67,4 +70,33 @@ func (c *ConcurrentMap[K, V]) Length() int {
 	c.Lock()
 	defer c.Unlock()
 	return len(c.items)
+}
+
+func (c *ConcurrentMap[K, V]) Sort(reverse bool) {
+	c.Lock()
+	defer c.Unlock()
+
+	type kv struct{
+		Key K
+		Value V
+	}
+
+	var tmp []kv
+	for k,v := c.items {
+		tmp = append(tmp, kv{Key: k, Value: v})
+	}
+
+	sort.Slice(tmp, func(i, j int) bool{
+		if(reverse){
+			return tmp[i].Value > tmp[j].value
+		}
+
+		return tmp[i].Value < tmp[j].value
+	})
+
+	c.items = make(map[K]V)
+
+	for k,v := tmp{
+		c.items[k] = v
+	}
 }
