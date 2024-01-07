@@ -80,7 +80,7 @@ func (c *ConcurrentMap[K, V]) Length() int {
 }
 
 func (c *ConcurrentMap[K, V]) Keys() (keys []K){
-	keys := make([]K, 0, len(c.items))
+	keys = make([]K, 0, len(c.items))
 
 	for k := range c.items{
 		keys = append(keys, k)
