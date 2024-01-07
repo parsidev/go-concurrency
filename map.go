@@ -3,7 +3,6 @@ package go_concurrency
 import (
 	"sort"
 	"sync"
-	"golang.org/x/exp/maps"
 )
 
 type ConcurrentMap[K comparable, V any] struct {
