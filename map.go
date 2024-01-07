@@ -1,13 +1,14 @@
 package go_concurrency
 
 import (
-	"sync"
 	"sort"
+	"sync"
 )
 
 type ConcurrentMap[K comparable, V any] struct {
 	sync.RWMutex
 	items map[K]V
+	less  func(a, b V, rev bool) bool
 }
 
 type ConcurrentMapItem[K comparable, V any] struct {
@@ -15,9 +16,14 @@ type ConcurrentMapItem[K comparable, V any] struct {
 	Value V
 }
 
-func NewMap[K comparable, V any]() *ConcurrentMap[K, V] {
+func NewMapNullableSort[K comparable, V any]() *ConcurrentMap[K, V] {
+	return NewMap[K, V](nil)
+}
+
+func NewMap[K comparable, V any](less func(a, b V, rev bool) bool) *ConcurrentMap[K, V] {
 	return &ConcurrentMap[K, V]{
 		items: make(map[K]V),
+		less:  less,
 	}
 }
 
@@ -76,27 +82,27 @@ func (c *ConcurrentMap[K, V]) Sort(reverse bool) {
 	c.Lock()
 	defer c.Unlock()
 
-	type kv struct{
-		Key K
+	if c.less == nil {
+		return
+	}
+
+	type kv struct {
+		Key   K
 		Value V
 	}
 
 	var tmp []kv
-	for k,v := c.items {
+	for k, v := range c.items {
 		tmp = append(tmp, kv{Key: k, Value: v})
 	}
 
-	sort.Slice(tmp, func(i, j int) bool{
-		if(reverse){
-			return tmp[i].Value > tmp[j].value
-		}
-
-		return tmp[i].Value < tmp[j].value
+	sort.Slice(tmp, func(i, j int) bool {
+		return c.less(tmp[i].Value, tmp[j].Value, reverse)
 	})
 
 	c.items = make(map[K]V)
 
-	for k,v := tmp{
-		c.items[k] = v
+	for _, item := range tmp {
+		c.items[item.Key] = item.Value
 	}
 }
