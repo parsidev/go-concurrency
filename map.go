@@ -16,12 +16,12 @@ type ConcurrentMapItem[K comparable, V any] struct {
 	Value V
 }
 
-func NewMapNullableSort[K comparable, V any]() *ConcurrentMap[K, V] {
+func NewMapNullableSort[K comparable, V any]() ConcurrentMap[K, V] {
 	return NewMap[K, V](nil)
 }
 
-func NewMap[K comparable, V any](less func(a, b V, rev bool) bool) *ConcurrentMap[K, V] {
-	return &ConcurrentMap[K, V]{
+func NewMap[K comparable, V any](less func(a, b V, rev bool) bool) ConcurrentMap[K, V] {
+	return ConcurrentMap[K, V]{
 		items: make(map[K]V),
 		less:  less,
 	}
