@@ -78,22 +78,21 @@ func (c *ConcurrentMap[K, V]) Length() int {
 	return len(c.items)
 }
 
-func (c *ConcurrentMap[K, V]) Keys() (keys []K){
+func (c *ConcurrentMap[K, V]) Keys() (keys []K) {
 	keys = make([]K, 0, len(c.items))
 
-	for k := range c.items{
+	for k := range c.items {
 		keys = append(keys, k)
 	}
 
 	return keys
 }
 
-
 func (c *ConcurrentMap[K, V]) First() (item *ConcurrentMapItem[K, V]) {
 	c.Lock()
 	defer c.Unlock()
 
-	for k, v := range c.items{
+	for k, v := range c.items {
 		item = &ConcurrentMapItem[K, V]{k, v}
 		break
 	}
